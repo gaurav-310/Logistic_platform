@@ -1,0 +1,17 @@
+static/css/custom.css
+
+body {
+    padding-top: 7px;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.container h2 {
+    margin-top: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
+}

@@ -1,0 +1,70 @@
+
+<!-- {%extends 'base.html' %} -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Booking</title>
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbSg7br_mo3_MCZqmYr84H5t5UdWaL8GU&libraries=places"></script>
+    
+    
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <!-- Form Section -->
+        <div class="col-md-6 form-section">
+            <h2>Create Booking</h2>
+            <form method="post" id="booking-form">
+                <!-- Pickup Location Field -->
+                <div class="form-group">
+                    <label for="id_pickup_location">Pickup Location</label>
+                    <input type="text" id="id_pickup_location" name="pickup_location" class="form-control" placeholder="Enter pickup location" />
+                </div>
+
+                <!-- Dropoff Location Field -->
+                <div class="form-group">
+                    <label for="id_dropoff_location">Dropoff Location</label>
+                    <input type="text" id="id_dropoff_location" name="dropoff_location" class="form-control" placeholder="Enter dropoff location" />
+                </div>
+
+                <!-- Vehicle Type Dropdown Field -->
+                <div class="form-group">
+                    <label for="id_vehicle_type">Vehicle Type</label>
+                    <select id="id_vehicle_type" name="vehicle_type" class="form-control">
+                        <option value="">Select a vehicle type</option>
+                        <option value="1" data-base-fare="50" data-cost-per-km="10">Sedan</option>
+                        <option value="2" data-base-fare="60" data-cost-per-km="12">SUV</option>
+                        <option value="3" data-base-fare="70" data-cost-per-km="15">Luxury</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" class="btn btn-primary" id="submit-button" onclick="calculateRoute()">Create Booking</button>
+            </form>
+        </div>
+
+        <!-- Map and Details Section -->
+        <div class="col-md-6 map-section">
+            <div id="map"></div>
+            <div id="details">
+                <div class="form-group">
+                    <label for="distance-display">Distance:</label>
+                    <input id="distance-display" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label for="estimated-cost-display">Estimated Cost:</label>
+                    <input id="estimated-cost-display" class="form-control" readonly />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/booking.js' %}"></script>
+
+</body>
+</html>
