@@ -1,36 +1,136 @@
-<!-- templates/accounts/driver_dashboard.html -->
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="container">
     <h2>Driver Dashboard</h2>
 
+    <!-- Update Location Section -->
+    <div class="update-location-section">
+        <form method="post">
+            {% csrf_token %}
+            <label for="current_location" class="form-label">Update Your Current Location:</label>
+            <input type="text" id="current_location" name="current_location" class="form-control" value="{{ current_location }}" placeholder="Enter your current location" />
+            <button type="submit" class="btn btn-primary mt-2">Update Location</button>
+        </form>
+        <p><strong>Your Current Location:</strong> {{ current_location }}</p>
+    </div>
+
+    <!-- Pending Bookings Section -->
+    <h3>Pending Bookings</h3>
     {% if pending_bookings %}
-        <h3>Pending Booking Requests</h3>
-        <ul class="list-group">
-            {% for booking in pending_bookings %}
-                <li class="list-group-item">
-                    <strong>Booking from {{ booking.user.username }}:</strong>
-                    <br> <strong>Pickup:</strong> {{ booking.pickup_location }}
-                    <br> <strong>Dropoff:</strong> {{ booking.dropoff_location }}
-                    <br> <strong>Distance:</strong> {{ booking.distance }} km
-                    <br> <strong>Estimated Cost:</strong> ${{ booking.estimated_cost }}
-                    <br> <strong>Date:</strong> {{ booking.date }}
-                    <div class="mt-2">
-                        <form method="post" action="{% url 'bookings:accept_booking' booking.id %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-success btn-sm">Accept</button>
-                        </form>
-                        <form method="post" action="{% url 'bookings:reject_booking' booking.id %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                        </form>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Pickup Location</th>
+                    <th>Dropoff Location</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in pending_bookings %}
+                    <tr>
+                        <td>{{ booking.pickup_location }}</td>
+                        <td>{{ booking.dropoff_location }}</td>
+                        <td>{{ booking.date }}</td>
+                        <td>
+                            <form method="post" action="{% url 'bookings:accept_booking' booking.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                            </form>
+                            <form method="post" action="{% url 'bookings:reject_booking' booking.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
-        <p>No pending booking requests.</p>
+        <p>No pending bookings.</p>
+    {% endif %}
+
+    <!-- Active Bookings Section -->
+    <h3>Your Active Bookings</h3>
+    {% if active_bookings %}
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Pickup Location</th>
+                    <th>Dropoff Location</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in active_bookings %}
+                    <tr>
+                        <td>{{ booking.pickup_location }}</td>
+                        <td>{{ booking.dropoff_location }}</td>
+                        <td>{{ booking.date }}</td>
+                        <td>{{ booking.get_status_display }}</td>
+                        <td>
+                            <!-- Form to update job status -->
+                            <form method="post" action="{% url 'accounts:update_job_status' booking.id %}">
+                                {% csrf_token %}
+                                <select name="job_status" class="form-control">
+                                    <option value="en_route_to_pickup" {% if booking.status == 'en_route_to_pickup' %}selected{% endif %}>En Route to Pickup</option>
+                                    <option value="goods_collected" {% if booking.status == 'goods_collected' %}selected{% endif %}>Goods Collected</option>
+                                    <option value="delivered" {% if booking.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary btn-sm mt-2">Update Status</button>
+                            </form>
+                            <!-- Complete Booking Button -->
+                            <form method="post" action="{% url 'accounts:complete_booking' booking.id %}" style="margin-top: 10px;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Complete Booking</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no active bookings.</p>
+    {% endif %}
+
+    <!-- Completed Bookings Section -->
+    <h3>Your Completed Bookings</h3>
+    {% if completed_bookings %}
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Pickup Location</th>
+                    <th>Dropoff Location</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in completed_bookings %}
+                    <tr>
+                        <td>{{ booking.pickup_location }}</td>
+                        <td>{{ booking.dropoff_location }}</td>
+                        <td>{{ booking.date }}</td>
+                        <td>{{ booking.get_status_display }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no completed bookings.</p>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbSg7br_mo3_MCZqmYr84H5t5UdWaL8GU&libraries=places"></script>
+    <script src="{% static 'js/driver_dashboard.js' %}"></script>
 {% endblock %}

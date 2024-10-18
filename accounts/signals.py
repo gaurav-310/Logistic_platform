@@ -5,21 +5,21 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 from .models import Profile,DriverProfile
 
-@receiver(post_save, sender=User)
-def create_or_update_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-    instance.profile.save()
+# @receiver(post_save, sender=User)
+# def create_or_update_user_profile(sender, instance, created, **kwargs):
+#     if created:
+#         Profile.objects.create(user=instance)
+#     instance.profile.save()
 
-# signals.py
+# # signals.py
 
 
-@receiver(post_save, sender=User)
-def create_driver_profile(sender, instance, created, **kwargs):
-    if created and instance.profile.role == 'driver':
-        DriverProfile.objects.create(user=instance)
+# @receiver(post_save, sender=User)
+# def create_driver_profile(sender, instance, created, **kwargs):
+#     if created and instance.profile.role == 'driver':
+#         DriverProfile.objects.create(user=instance)
 
-@receiver(post_save, sender=User)
-def save_driver_profile(sender, instance, **kwargs):
-    if instance.profile.role == 'driver':
-        instance.driverprofile.save()
+# @receiver(post_save, sender=User)
+# def save_driver_profile(sender, instance, **kwargs):
+#     if instance.profile.role == 'driver':
+#         instance.driverprofile.save()

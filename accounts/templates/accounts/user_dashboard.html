@@ -1,8 +1,13 @@
 <!-- accounts/templates/accounts/user_dashboard.html -->
 
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
+
+{% block extra_css %}
+    <!-- <link rel="stylesheet" href="{% static 'css/custom.css' %}"> -->
+{% endblock %}
+
 <div class="container">
     <h2>User Dashboard</h2>
     <p>Welcome, {{ user.username }}! This is your dashboard.</p>
@@ -32,13 +37,13 @@
                         <td>{{ booking.date }}</td>
                         <td>{{ booking.status|capfirst }}</td>
                         <td>
-                            {% if booking.status == 'approved' %}
-                                {{ booking.driver.username }}
-                            {% else %}
-                                Pending
-                            {% endif %}
+                            {% if booking.driver %}
+                            {{ booking.driver.username }}
+                        {% else %}
+                            Pending
+                        {% endif %}
                         </td>
-                        <td><a href="#" class="btn btn-info btn-sm">View Details</a></td>
+                        <td><a href="{% url 'accounts:booking_detail' booking.id %}" class="btn btn-info btn-sm">View Details</a></td>
                         <td>
                             <form method="POST" action="{% url 'bookings:delete_booking' booking.id %}">
                                 {% csrf_token %}

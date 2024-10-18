@@ -1,0 +1,60 @@
+<!-- templates/accounts/booking_detail.html -->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <!-- Link to your CSS file -->
+    <link rel="stylesheet" href="{% static 'css/booking_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Booking Details</h2>
+
+    <div class="details-container">
+        <div class="details">
+            <p><strong>Pickup Location:</strong> {{ booking.pickup_location }}</p>
+            <p><strong>Dropoff Location:</strong> {{ booking.dropoff_location }}</p>
+            <p><strong>Date:</strong> {{ booking.date }}</p>
+            <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
+
+            {% if driver_profile %}
+                <h3>Driver Details</h3>
+                <p><strong>Driver Name:</strong> {{ driver_profile.user.username }}</p>
+                <p><strong>Current Status:</strong> {{ booking.get_status_display }}</p>
+                <p><strong>Driver's Current Location:</strong> {{ driver_profile.current_location }}</p>
+            {% else %}
+                <p>No driver has accepted this booking yet.</p>
+            {% endif %}
+
+            <a href="{% url 'accounts:user_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+
+        {% if driver_profile %}
+        <div class="map-container">
+            <!-- Map displaying driver's current location and drop-off location -->
+            <div id="map"></div>
+            <div id="distance" class="distance-info"></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Load the Google Maps JavaScript API -->
+    <!-- Replace 'YOUR_GOOGLE_API_KEY' with your actual API key -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbSg7br_mo3_MCZqmYr84H5t5UdWaL8GU&libraries=places"></script>
+
+    {% if driver_profile %}
+        <!-- Pass data from Django template to JavaScript -->
+        <script>
+            var driverCurrentLocation = "{{ driver_profile.current_location|escapejs }}";
+            var bookingDropoffLocation = "{{ booking.dropoff_location|escapejs }}";
+        </script>
+    {% endif %}
+
+    <!-- Include the external JavaScript file -->
+    <script src="{% static 'js/booking_detail.js' %}"></script>
+{% endblock %}

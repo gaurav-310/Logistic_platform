@@ -24,23 +24,42 @@ def driver_dashboard(request):
     return render(request, 'accounts/driver_dashboard.html', context)
 
 # Accept booking view
+# bookings/views.py
+
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.shortcuts import redirect, get_object_or_404
+from django.db import transaction
+
 @login_required
 def accept_booking(request, booking_id):
-    # Fetch the booking with pending status
-    booking = get_object_or_404(Booking, id=booking_id, status='pending')
+    # if not request.user.groups.filter(name='Drivers').exists():
+    #     messages.error(request, "Only drivers can accept bookings.")
+    #     return redirect('accounts:driver_dashboard')
 
-    # If a driver has already accepted it, don't allow others to accept
-    if booking.driver is not None:
-        messages.error(request, "This booking has already been accepted by another driver.")
-        return redirect('accounts:driver_dashboard')
+    try:
+        with transaction.atomic():
+            # Lock the booking row to prevent race conditions
+            booking = Booking.objects.select_for_update().get(id=booking_id)
 
-    # Assign the current driver to the booking and update status to approved
-    booking.driver = request.user
-    booking.status = 'approved'
-    booking.save()
+            if booking.status != 'pending':
+                messages.error(request, "This booking has already been accepted or is no longer available.")
+                return redirect('accounts:driver_dashboard')
 
-    messages.success(request, "You have accepted the booking.")
+            # Assign the current driver to the booking and update status to 'accepted'
+            booking.driver = request.user
+            booking.status = 'accepted'
+            booking.save()
+
+        messages.success(request, "You have accepted the booking.")
+    except Booking.DoesNotExist:
+        messages.error(request, "Booking does not exist.")
+    except Exception as e:
+        messages.error(request, "An error occurred while accepting the booking.")
+        print(f"Error in accept_booking view: {e}")
+
     return redirect('accounts:driver_dashboard')
+
 
 # Reject booking view
 @login_required
@@ -95,7 +114,7 @@ def confirm_booking(request):
             vehicle_type_id=vehicle_type_id,
             date=date,
             estimated_cost=estimated_cost,
-            status='confirmed'
+            status='pending'
         )
 
         # Notify drivers about the new booking request
@@ -122,3 +141,33 @@ def delete_booking(request, booking_id):
     booking.delete()
     messages.success(request, "Booking deleted successfully.")
     return redirect('accounts:user_dashboard')
+
+
+@login_required
+
+def update_job_status(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, driver=request.user)
+
+    if request.method == 'POST':
+        job_status = request.POST.get('job_status')
+
+        if job_status in dict(Booking.STATUS_CHOICES):
+            booking.status = job_status
+            booking.save()
+            messages.success(request, 'Job status updated successfully.')
+        else:
+            messages.error(request, 'Invalid job status.')
+
+    return redirect('accounts:driver_dashboard')
+
+@login_required
+
+def complete_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, driver=request.user)
+
+    if request.method == 'POST':
+        booking.status = 'completed'
+        booking.save()
+        messages.success(request, 'Booking marked as completed.')
+
+    return redirect('accounts:driver_dashboard')

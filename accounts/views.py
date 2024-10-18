@@ -19,6 +19,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            user.save()
             role = user.profile.role
             messages.success(request, "Registration successful.")
             # Redirect based on role
@@ -72,20 +73,59 @@ def user_dashboard(request):
     return render(request, 'accounts/user_dashboard.html', {'bookings': bookings})
 
 # Driver dashboard - showing pending bookings to accept/reject
-@login_required
-@role_required(allowed_roles=['driver'])
+# @login_required
+# @role_required(allowed_roles=['driver'])
+# def driver_dashboard(request):
+#     # Fetch the driver profile
+#     driver_profile, created = DriverProfile.objects.get_or_create(user=request.user)
+    
+#     # Get all pending bookings and accepted bookings
+#     pending_bookings = Booking.objects.filter(status='pending')
+#     accepted_bookings = Booking.objects.filter(status='accepted', driver=request.user)
+
+#     if request.method == 'POST':
+#         # Update the current location when the form is submitted
+#         current_location = request.POST.get('current_location')
+#         if current_location:
+#             driver_profile.current_location = current_location
+#             driver_profile.save()
+#             messages.success(request, 'Location updated successfully.')
+#             # Redirect to prevent form re-submission
+#             return redirect('accounts:driver_dashboard')
+    
+#     context = {
+#         'driver_profile': driver_profile,  # Make sure this contains current_location
+#         'current_location': driver_profile.current_location,  # Pass the current location to the template
+#         'pending_bookings': pending_bookings,
+#         'accepted_bookings': accepted_bookings
+#     }
+    
+#     return render(request, 'accounts/driver_dashboard.html', context)
+
+
 @login_required
 @role_required(allowed_roles=['driver'])
 def driver_dashboard(request):
-    # Fetch the driver profile
-    driver = DriverProfile.objects.get(user=request.user)
+    driver_profile, created = DriverProfile.objects.get_or_create(user=request.user)
     
-    # Get all pending bookings (or add any filtering you need)
     pending_bookings = Booking.objects.filter(status='pending')
+    active_bookings = Booking.objects.filter(driver=request.user).exclude(status='completed')
+    completed_bookings = Booking.objects.filter(driver=request.user, status='completed')
+    
+    if request.method == 'POST':
+        current_location = request.POST.get('current_location')
+        if current_location:
+            driver_profile.current_location = current_location
+            driver_profile.save()
+            messages.success(request, 'Location updated successfully.')
+            return redirect('accounts:driver_dashboard')
     
     context = {
-        'driver_profile': driver,
-        'pending_bookings': pending_bookings
+        'driver_profile': driver_profile,
+        'current_location': driver_profile.current_location,
+        'pending_bookings': pending_bookings,
+        'active_bookings': active_bookings,
+        'completed_bookings': completed_bookings,
     }
     
     return render(request, 'accounts/driver_dashboard.html', context)
@@ -108,3 +148,52 @@ def confirm_booking(request, booking_id):
     
     messages.success(request, "Your booking has been confirmed and is awaiting driver approval.")
     return redirect('accounts:user_dashboard')
+
+@login_required
+def booking_detail_view(request, booking_id):
+    # Get the booking object based on booking_id
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    
+    # Fetch the driver assigned to the booking (if any)
+    driver_profile = None
+    if booking.driver:
+        driver_profile = DriverProfile.objects.get(user=booking.driver)
+    
+    context = {
+        'booking': booking,
+        'driver_profile': driver_profile,  # Contains driver's current location
+    }
+    return render(request, 'accounts/booking_detail.html', context)
+
+@login_required
+@role_required(allowed_roles=['driver'])
+def update_job_status(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, driver=request.user)
+
+    if request.method == 'POST':
+        job_status = request.POST.get('job_status')
+
+        # Update the booking status based on the driver's selection
+        if job_status == 'en_route_to_pickup':
+            booking.status = 'en_route_to_pickup'
+        elif job_status == 'goods_collected':
+            booking.status = 'goods_collected'
+        elif job_status == 'delivered':
+            booking.status = 'delivered'
+
+        booking.save()
+        messages.success(request, 'Job status updated successfully.')
+    
+    return redirect('accounts:driver_dashboard')
+
+@login_required
+@role_required(allowed_roles=['driver'])
+def complete_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, driver=request.user)
+
+    if request.method == 'POST':
+        booking.status = 'completed'
+        booking.save()
+        messages.success(request, 'Booking marked as completed.')
+    
+    return redirect('accounts:driver_dashboard')

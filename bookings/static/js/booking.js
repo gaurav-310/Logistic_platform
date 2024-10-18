@@ -16,7 +16,12 @@ function initMap() {
     new google.maps.places.Autocomplete(document.getElementById('id_pickup_location'));
     new google.maps.places.Autocomplete(document.getElementById('id_dropoff_location'));
 }
+function initAutocomplete() {
+    const input = document.getElementById('current_location');
+    const autocomplete = new google.maps.places.Autocomplete(input);
+}
 
+google.maps.event.addDomListener(window, 'load', initAutocomplete);
 // Function to calculate the route and display results
 async function calculateRoute() {
     const pickupPlace = document.getElementById('id_pickup_location').value;

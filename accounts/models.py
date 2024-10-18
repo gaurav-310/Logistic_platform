@@ -18,6 +18,7 @@ class DriverProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     location = models.CharField(max_length=255, blank=True, null=True)
     vehicle = models.CharField(max_length=100, blank=True, null=True)
+    current_location = models.CharField(max_length=255, null=True, blank=True) 
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"
