@@ -1,23 +1,36 @@
 <!-- templates/accounts/driver_dashboard.html -->
-
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
 <div class="container">
     <h2>Driver Dashboard</h2>
 
-    {% if driver_profile.location and driver_profile.vehicle %}
-        <p><strong>Location:</strong> {{ driver_profile.location }}</p>
-        <p><strong>Vehicle:</strong> {{ driver_profile.vehicle }}</p>
+    {% if pending_bookings %}
+        <h3>Pending Booking Requests</h3>
+        <ul class="list-group">
+            {% for booking in pending_bookings %}
+                <li class="list-group-item">
+                    <strong>Booking from {{ booking.user.username }}:</strong>
+                    <br> <strong>Pickup:</strong> {{ booking.pickup_location }}
+                    <br> <strong>Dropoff:</strong> {{ booking.dropoff_location }}
+                    <br> <strong>Distance:</strong> {{ booking.distance }} km
+                    <br> <strong>Estimated Cost:</strong> ${{ booking.estimated_cost }}
+                    <br> <strong>Date:</strong> {{ booking.date }}
+                    <div class="mt-2">
+                        <form method="post" action="{% url 'bookings:accept_booking' booking.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                        </form>
+                        <form method="post" action="{% url 'bookings:reject_booking' booking.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
     {% else %}
-        <p>No information available. Please update your details below:</p>
+        <p>No pending booking requests.</p>
     {% endif %}
-
-    <h3>Update Info</h3>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save Info</button>
-    </form>
 </div>
 {% endblock %}

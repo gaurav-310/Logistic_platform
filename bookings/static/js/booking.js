@@ -46,6 +46,10 @@ async function calculateRoute() {
         // Show the map and details
         document.getElementById('map').style.display = 'block';
         document.getElementById('details').style.display = 'block';
+
+        // Show the confirm booking button
+        document.getElementById('confirm-button').style.display = 'inline-block';
+        
     } catch (error) {
         alert('An error occurred while calculating the route. Please try again.');
         console.error(error);
@@ -65,6 +69,99 @@ function calculateEstimatedCost(distanceInKm) {
     // Display the estimated cost
     document.getElementById('estimated-cost-display').value = '₹ ' + estimatedCost.toFixed(2);
 }
+function confirmBooking() {
+    const pickupLocation = document.getElementById('id_pickup_location').value;
+    const dropoffLocation = document.getElementById('id_dropoff_location').value;
+    const vehicleType = document.getElementById('id_vehicle_type').value;
+    const date = document.getElementById('id_date').value;
+    const estimatedCost = document.getElementById('estimated-cost-display').value.replace('₹ ', '');
+
+    // Prepare the data to send
+    const bookingData = {
+        pickup_location: pickupLocation,
+        dropoff_location: dropoffLocation,
+        vehicle_type: vehicleType,
+        date: date,
+        estimated_cost: estimatedCost,
+    };
+
+    // Get CSRF token
+    const csrftoken = getCookie('csrftoken');
+
+    // Send the POST request to the server
+    fetch('/bookings/confirm/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify(bookingData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);  // Show success message
+            window.location.href = "/accounts/user_dashboard/";  // Redirect to the user dashboard
+        } else if (data.error) {
+            alert(data.error);  // Show error message from server
+        } else {
+            alert('An unknown error occurred.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+            const cookieTrimmed = cookie.trim();
+            if (cookieTrimmed.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookieTrimmed.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+// Confirm Booking and send details to the server (called on 'Confirm Booking')
+// function confirmBooking() {
+//     const pickupLocation = document.getElementById('id_pickup_location').value;
+//     const dropoffLocation = document.getElementById('id_dropoff_location').value;
+//     const vehicleType = document.getElementById('id_vehicle_type').value;
+//     const date = document.getElementById('id_date').value;
+//     const estimatedCost = document.getElementById('estimated-cost-display').value;
+
+//     const bookingData = {
+//         pickup_location: pickupLocation,
+//         dropoff_location: dropoffLocation,
+//         vehicle_type: vehicleType,
+//         date: date,
+//         estimated_cost: estimatedCost,
+//     };
+
+//     // AJAX request to send booking data to the server
+//     fetch('/bookings/confirm/', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+//         },
+//         body: JSON.stringify(bookingData),
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.message) {
+//             alert(data.message);  // Show success message
+//             window.location.href = "/accounts/user_dashboard/";  // Redirect to the user dashboard
+//         } else {
+//             alert('An error occurred while confirming the booking.');
+//         }
+//     })
+//     .catch(error => console.error('Error:', error));
+// }
 
 // Prevent default form submission
 document.getElementById('booking-form').addEventListener('submit', function(event) {

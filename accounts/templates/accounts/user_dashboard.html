@@ -6,8 +6,51 @@
 <div class="container">
     <h2>User Dashboard</h2>
     <p>Welcome, {{ user.username }}! This is your dashboard.</p>
-    <a href="{% url 'bookings:create_booking' %}" class="btn btn-success">Create a New Booking</a>
-    <!-- List user's bookings -->
-</div>
+    <a href="{% url 'bookings:create_booking' %}" class="btn btn-success mb-4">Create a New Booking</a>
 
+    <!-- List user's bookings -->
+    <h3>Your Bookings</h3>
+
+    {% if bookings %}
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Pickup Location</th>
+                    <th>Dropoff Location</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Driver</th>
+                    <th>Details</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.pickup_location }}</td>
+                        <td>{{ booking.dropoff_location }}</td>
+                        <td>{{ booking.date }}</td>
+                        <td>{{ booking.status|capfirst }}</td>
+                        <td>
+                            {% if booking.status == 'approved' %}
+                                {{ booking.driver.username }}
+                            {% else %}
+                                Pending
+                            {% endif %}
+                        </td>
+                        <td><a href="#" class="btn btn-info btn-sm">View Details</a></td>
+                        <td>
+                            <form method="POST" action="{% url 'bookings:delete_booking' booking.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no bookings yet.</p>
+    {% endif %}
+</div>
 {% endblock %}

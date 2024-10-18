@@ -37,8 +37,22 @@
                     </select>
                 </div>
 
+                <!-- Date -->
+                <div class="form-group">
+                    <label for="id_date">Booking Date</label>
+                    <input type="date" id="id_date" name="date" class="form-control" required />
+                </div>
+
+
                 <!-- Submit Button -->
                 <button type="button" class="btn btn-primary" id="submit-button" onclick="calculateRoute()">Create Booking</button>
+
+                
+                <!-- Confirm booking button initially hidden -->
+                <!-- Confirm booking button initially hidden -->
+<button type="button" class="btn btn-success" id="confirm-button" style="display:none;" data-booking-id="{{ booking.id }}" onclick="confirmBooking()">Confirm Booking</button>
+
+            
             </form>
         </div>
 
@@ -63,4 +77,6 @@
 {% block extra_js %}
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbSg7br_mo3_MCZqmYr84H5t5UdWaL8GU&libraries=places"></script>
 <script src="{% static 'js/booking.js' %}"></script>
+
+
 {% endblock %}

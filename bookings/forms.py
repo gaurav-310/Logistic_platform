@@ -6,9 +6,11 @@ from .models import Booking, VehicleType
 # bookings/forms.py
 
 class BookingForm(forms.ModelForm):
+    date = forms.DateField(widget=forms.SelectDateWidget)
     class Meta:
         model = Booking
-        fields = ['pickup_location', 'dropoff_location', 'vehicle_type']
+        
+        fields = ['pickup_location', 'dropoff_location', 'vehicle_type','date']
         widgets ={
             'distance': forms.HiddenInput(),
             'estimated_cost': forms.HiddenInput(),

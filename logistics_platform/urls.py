@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('bookings/', include('bookings.urls', namespace='bookings')),
+    
     path('', include('home.urls')),  # Assuming you have a 'home' app
 ]
 # logistics_platform/urls.py
