@@ -1,8 +1,11 @@
-# accounts/forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import DriverProfile, Profile
+from .models import DriverProfile,Profile
+
+from django import forms
+from django.contrib.auth.models import User
+from .models import Profile
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -21,16 +24,11 @@ class UserRegistrationForm(UserCreationForm):
         user.email = self.cleaned_data['email']
         if commit:
             user.save()
-            # Create Profile
-            role = self.cleaned_data['role']
-            profile = Profile.objects.create(user=user, role=role)
-            profile.save()
-            # If the role is 'driver', create DriverProfile
-            if role == 'driver':
-                DriverProfile.objects.create(user=user)
+            # No need to manually create the profile, signal will handle it
+            user.profile.role = self.cleaned_data['role']
+            user.profile.save()
         return user
-
 class DriverProfileForm(forms.ModelForm):
     class Meta:
         model = DriverProfile
-        fields = ['current_location']  # Include any other fields you have in DriverProfile
+        fields = ['location', 'vehicle']

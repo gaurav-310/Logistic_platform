@@ -2,33 +2,46 @@
 
 {% block title %}View All Bookings{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+{% endblock %}
+
 {% block content %}
-<h1>All Bookings</h1>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>User</th>
-            <th>Pickup Location</th>
-            <th>Dropoff Location</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Driver</th>
-            <th>Created At</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for booking in bookings %}
-        <tr>
-            <td>{{ booking.id }}</td>
-            <td>{{ booking.user.username }}</td>
-            <td>{{ booking.pickup_location }}</td>
-            <td>{{ booking.dropoff_location }}</td>
-            <td>{{ booking.date }}</td>
-            <td>{{ booking.status }}</td>
-            <td>{{ booking.created_at }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container mt-4">
+    <h1 class="mb-4">All Bookings</h1>
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Pickup Location</th>
+                <th>Dropoff Location</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Driver</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.id }}</td>
+                <td>{{ booking.user.username }}</td>
+                <td>{{ booking.pickup_location }}</td>
+                <td>{{ booking.dropoff_location }}</td>
+                <td>{{ booking.date }}</td>
+                <td>{{ booking.status }}</td>
+                <td>
+                    {% if booking.driver %}
+                        {{ booking.driver.username }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>{{ booking.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

@@ -25,6 +25,20 @@
                     <li class="nav-item">
                         <span class="navbar-text">Welcome, {{ user.username }}!</span>
                     </li>
+                    <!-- Dashboard Link Depending on User Role -->
+                    {% if user.profile.role == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:admin_dashboard' %}">Dashboard</a>
+                        </li>
+                    {% elif user.profile.role == 'driver' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:driver_dashboard' %}">Dashboard</a>
+                        </li>
+                    {% elif user.profile.role == 'user' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:user_dashboard' %}">Dashboard</a>
+                        </li>
+                    {% endif %}
                 {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
@@ -65,10 +79,5 @@
     <!-- Block for additional JavaScript from child templates -->
     {% block extra_js %}
     {% endblock %}
-</body>
-</html>
-
-    
-    
 </body>
 </html>

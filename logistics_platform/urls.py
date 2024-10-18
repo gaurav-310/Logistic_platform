@@ -17,17 +17,12 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from accounts import views as accounts_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('bookings/', include('bookings.urls', namespace='bookings')),
-    path('admin-dashboard/', include('admin_dashboard.urls', namespace='admin_dashboard')),
-    path('accounts/login/', accounts_views.custom_login, name='login'),
-    path('accounts/', include('django.contrib.auth.urls')),  # For logout, password reset, etc.
-    path('', include('home.urls')),  # Assuming you have a 'home' ap
+    path('', include('home.urls')),  # Assuming you have a 'home' app
 ]
 # logistics_platform/urls.py
 

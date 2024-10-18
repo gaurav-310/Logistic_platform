@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'accounts',
     'home',
     'bookings',
-    'admin_dashboard',
     
     ]
 

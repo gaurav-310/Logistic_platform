@@ -1,4 +1,6 @@
+
 # accounts/views.py
+
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
@@ -18,14 +20,15 @@ from .models import Profile
 
 
 
-# Registration view
+
+
+
 def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            user.save()
             role = user.profile.role
             messages.success(request, "Registration successful.")
             # Redirect based on role
@@ -42,51 +45,37 @@ def register_view(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 
-# Login view
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request=request, data=request.POST)
         if form.is_valid():
-            username_or_email = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            
-            # Attempt to authenticate with username
-            user = authenticate(request, username=username_or_email, password=password)
-            
-            if user is None:
-                # Attempt to authenticate with email
-                try:
-                    user_obj = User.objects.get(email=username_or_email)
-                    user = authenticate(request, username=user_obj.username, password=password)
-                except User.DoesNotExist:
-                    user = None
-            
-            if user is not None:
-                login(request, user)
-                role = user.profile.role
-                messages.success(request, "Login successful.")
-                # Redirect based on role
-                if role == 'admin':
-                    return redirect('accounts:admin_dashboard')
-                elif role == 'driver':
-                    return redirect('accounts:driver_dashboard')
-                else:
-                    return redirect('accounts:user_dashboard')
+            user = form.get_user()
+            login(request, user)
+            role = user.profile.role
+            messages.success(request, "Login successful.")
+            # Redirect based on role
+            if role == 'user':
+                return redirect('accounts:user_dashboard')
+            elif role == 'driver':
+                return redirect('accounts:driver_dashboard')
             else:
-                messages.error(request, "Invalid credentials.")
+                return redirect('accounts:admin_dashboard')
+        else:
+            messages.error(request, "Invalid credentials.")
     else:
         form = AuthenticationForm()
     return render(request, 'accounts/login.html', {'form': form})
 
 
 
-# Logout view
 def logout_view(request):
     logout(request)
     messages.info(request, "You have successfully logged out.")
     return redirect('home')
 
-# User dashboard - showing user's bookings
+
+
+
 @login_required
 @role_required(allowed_roles=['user'])
 def user_dashboard(request):
@@ -94,35 +83,7 @@ def user_dashboard(request):
     bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'accounts/user_dashboard.html', {'bookings': bookings})
 
-# Driver dashboard - showing pending bookings to accept/reject
-# @login_required
-# @role_required(allowed_roles=['driver'])
-# def driver_dashboard(request):
-#     # Fetch the driver profile
-#     driver_profile, created = DriverProfile.objects.get_or_create(user=request.user)
-    
-#     # Get all pending bookings and accepted bookings
-#     pending_bookings = Booking.objects.filter(status='pending')
-#     accepted_bookings = Booking.objects.filter(status='accepted', driver=request.user)
 
-#     if request.method == 'POST':
-#         # Update the current location when the form is submitted
-#         current_location = request.POST.get('current_location')
-#         if current_location:
-#             driver_profile.current_location = current_location
-#             driver_profile.save()
-#             messages.success(request, 'Location updated successfully.')
-#             # Redirect to prevent form re-submission
-#             return redirect('accounts:driver_dashboard')
-    
-#     context = {
-#         'driver_profile': driver_profile,  # Make sure this contains current_location
-#         'current_location': driver_profile.current_location,  # Pass the current location to the template
-#         'pending_bookings': pending_bookings,
-#         'accepted_bookings': accepted_bookings
-#     }
-    
-#     return render(request, 'accounts/driver_dashboard.html', context)
 
 
 @login_required
@@ -152,13 +113,13 @@ def driver_dashboard(request):
     
     return render(request, 'accounts/driver_dashboard.html', context)
 
-# Admin dashboard
+
 @login_required
 @role_required(allowed_roles=['admin'])
 def admin_dashboard(request):
     return render(request, 'accounts/admin_dashboard.html')
 
-# Confirm booking - User confirms a booking and drivers are notified
+
 @login_required
 def confirm_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
@@ -221,29 +182,16 @@ def complete_booking(request, booking_id):
     return redirect('accounts:driver_dashboard')
 
 
-def custom_login(request):
-    if request.method == 'POST':
-        username_or_email = request.POST.get('username')
-        password = request.POST.get('password')
 
-        # Try to authenticate with username
-        user = authenticate(request, username=username_or_email, password=password)
 
-        
 
-        if user is not None:
-            login(request, user)
-            if user.is_staff:
-                # Redirect staff/admin users to the admin dashboard
-                return redirect('admin_dashboard:dashboard_home')
-            else:
-                # Redirect regular users to the user dashboard
-                return redirect('accounts:user_dashboard')
-        else:
-            messages.error(request, 'Invalid username or password.')
-            return render(request, 'registration/login.html', {'error': 'Invalid username or password.'})
-    else:
-        return render(request, 'registration/login.html')
+
+
+    
+
+
+
+
 @login_required
 @role_required(allowed_roles=['admin'])
 def manage_users(request):
@@ -290,3 +238,13 @@ def analytics(request):
         'driver_performance': driver_performance,
     }
     return render(request, 'accounts/analytics.html', context)
+def deactivate_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        # Check if the user is an admin (superuser)
+        if user.is_superuser:
+            messages.error(request, 'Admin users cannot be deleted.')
+        else:
+            user.delete()
+            messages.success(request, f'User {user.username} has been deleted successfully.')
+        return redirect('accounts:manage_users')

@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin_dashboard/manage_users/', views.manage_users, name='manage_users'),
     path('admin_dashboard/view_all_bookings/', views.view_all_bookings, name='view_all_bookings'),
     path('admin_dashboard/analytics/', views.analytics, name='analytics'),
+    path('admin_dashboard/manage_users/deactivate/<int:user_id>/', views.deactivate_user, name='deactivate_user'),
 ]
