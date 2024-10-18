@@ -131,6 +131,7 @@
 {% endblock %}
 
 {% block extra_js %}
-   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbSg7br_mo3_MCZqmYr84H5t5UdWaL8GU&libraries=places"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places"></script>
+
     <script src="{% static 'js/driver_dashboard.js' %}"></script>
 {% endblock %}
