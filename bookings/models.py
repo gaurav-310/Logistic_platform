@@ -36,5 +36,11 @@ class Booking(models.Model):
     estimated_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     driver = models.ForeignKey(User, related_name='driver_bookings', null=True, blank=True, on_delete=models.SET_NULL)
+    start_time = models.DateTimeField(null=True, blank=True)  # When the trip starts
+    end_time = models.DateTimeField(null=True, blank=True)    # When the trip ends
+    def trip_duration(self):
+        if self.start_time and self.end_time:
+            return self.end_time - self.start_time
+        return None
     def __str__(self):
         return f"{self.user.username}'s Booking ({self.pickup_location} to {self.dropoff_location})"

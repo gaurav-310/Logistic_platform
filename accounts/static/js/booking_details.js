@@ -1,50 +1,58 @@
-// booking_detail.js
+// static/js/booking_detail.js
+
+let map, directionsService, directionsRenderer;
+
+// Initialize the Google Map and directions service
 
 function initMap() {
-    var mapOptions = {
-        zoom: 10,
-        center: { lat: -34.397, lng: 150.644 } // Default center, will be reset later
-    };
-    var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-    var bounds = new google.maps.LatLngBounds();
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer();
 
-    if (typeof driverCurrentLocation !== 'undefined' && typeof bookingDropoffLocation !== 'undefined') {
-        var geocoder = new google.maps.Geocoder();
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 28.6139, lng: 77.209 }, // Default center, can be adjusted
+        zoom: 8
+    });
 
-        // Geocode the driver's current location
-        geocoder.geocode({ 'address': driverCurrentLocation }, function (results, status) {
-            if (status === 'OK') {
-                var driverLocation = results[0].geometry.location;
-                var driverMarker = new google.maps.Marker({
-                    map: map,
-                    position: driverLocation,
-                    label: 'Driver'
-                });
-                bounds.extend(driverLocation);
-                map.fitBounds(bounds);
-            } else {
-                console.error('Geocode was not successful for the following reason: ' + status);
-            }
+    directionsRenderer.setMap(map);
+
+    // Now, calculate and display the route
+    calculateRoute();
+}
+
+// Function to calculate the route and display results
+async function calculateRoute() {
+    const driverLocation = driverCurrentLocation;
+    const dropoffLocation = bookingDropoffLocation;
+
+    if (!driverLocation || !dropoffLocation) {
+        alert('Driver or dropoff location not available.');
+        return;
+    }
+
+    try {
+        const results = await directionsService.route({
+            origin: driverLocation,
+            destination: dropoffLocation,
+            travelMode: google.maps.TravelMode.DRIVING,
         });
 
-        // Geocode the drop-off location
-        geocoder.geocode({ 'address': bookingDropoffLocation }, function (results, status) {
-            if (status === 'OK') {
-                var dropoffLocation = results[0].geometry.location;
-                var dropoffMarker = new google.maps.Marker({
-                    map: map,
-                    position: dropoffLocation,
-                    label: 'Drop-off'
-                });
-                bounds.extend(dropoffLocation);
-                map.fitBounds(bounds);
-            } else {
-                console.error('Geocode was not successful for the following reason: ' + status);
-            }
-        });
-    } else {
-        console.error('Driver current location or booking drop-off location is not defined.');
+        directionsRenderer.setDirections(results);
+        const route = results.routes[0];
+        const distanceInMeters = route.legs[0].distance.value;
+        const distanceInKm = distanceInMeters / 1000;
+        const duration = route.legs[0].duration.text;
+
+        // Display the distance and estimated time
+        document.getElementById('distance-display').value = distanceInKm.toFixed(2) + ' km';
+        document.getElementById('duration-display').value = duration;
+
+    } catch (error) {
+        alert('An error occurred while calculating the route. Please try again.');
+        console.error(error);
     }
 }
 
-google.maps.event.addDomListener(window, 'load', initMap);
+// Initialize the map when the window loads
+window.onload = function() {
+    initMap();
+};

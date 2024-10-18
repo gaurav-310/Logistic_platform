@@ -1,0 +1,34 @@
+{% extends 'accounts/admin_base.html' %}
+
+{% block title %}View All Bookings{% endblock %}
+
+{% block content %}
+<h1>All Bookings</h1>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Pickup Location</th>
+            <th>Dropoff Location</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Driver</th>
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in bookings %}
+        <tr>
+            <td>{{ booking.id }}</td>
+            <td>{{ booking.user.username }}</td>
+            <td>{{ booking.pickup_location }}</td>
+            <td>{{ booking.dropoff_location }}</td>
+            <td>{{ booking.date }}</td>
+            <td>{{ booking.status }}</td>
+            <td>{{ booking.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

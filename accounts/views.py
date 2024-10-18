@@ -10,6 +10,12 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .decorators import role_required
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+
+from django.contrib import messages
+from .models import Profile
+
 
 
 # Registration view
@@ -41,22 +47,38 @@ def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request=request, data=request.POST)
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            role = user.profile.role
-            messages.success(request, "Login successful.")
-            # Redirect based on role
-            if role == 'user':
-                return redirect('accounts:user_dashboard')
-            elif role == 'driver':
-                return redirect('accounts:driver_dashboard')
+            username_or_email = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            
+            # Attempt to authenticate with username
+            user = authenticate(request, username=username_or_email, password=password)
+            
+            if user is None:
+                # Attempt to authenticate with email
+                try:
+                    user_obj = User.objects.get(email=username_or_email)
+                    user = authenticate(request, username=user_obj.username, password=password)
+                except User.DoesNotExist:
+                    user = None
+            
+            if user is not None:
+                login(request, user)
+                role = user.profile.role
+                messages.success(request, "Login successful.")
+                # Redirect based on role
+                if role == 'admin':
+                    return redirect('accounts:admin_dashboard')
+                elif role == 'driver':
+                    return redirect('accounts:driver_dashboard')
+                else:
+                    return redirect('accounts:user_dashboard')
             else:
-                return redirect('accounts:admin_dashboard')
-        else:
-            messages.error(request, "Invalid credentials.")
+                messages.error(request, "Invalid credentials.")
     else:
         form = AuthenticationForm()
     return render(request, 'accounts/login.html', {'form': form})
+
+
 
 # Logout view
 def logout_view(request):
@@ -197,3 +219,74 @@ def complete_booking(request, booking_id):
         messages.success(request, 'Booking marked as completed.')
     
     return redirect('accounts:driver_dashboard')
+
+
+def custom_login(request):
+    if request.method == 'POST':
+        username_or_email = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Try to authenticate with username
+        user = authenticate(request, username=username_or_email, password=password)
+
+        
+
+        if user is not None:
+            login(request, user)
+            if user.is_staff:
+                # Redirect staff/admin users to the admin dashboard
+                return redirect('admin_dashboard:dashboard_home')
+            else:
+                # Redirect regular users to the user dashboard
+                return redirect('accounts:user_dashboard')
+        else:
+            messages.error(request, 'Invalid username or password.')
+            return render(request, 'registration/login.html', {'error': 'Invalid username or password.'})
+    else:
+        return render(request, 'registration/login.html')
+@login_required
+@role_required(allowed_roles=['admin'])
+def manage_users(request):
+    users = User.objects.all()
+    return render(request, 'accounts/manage_users.html', {'users': users})
+@login_required
+@role_required(allowed_roles=['admin'])
+def view_all_bookings(request):
+    bookings = Booking.objects.all().order_by('-created_at')
+    return render(request, 'accounts/view_all_bookings.html', {'bookings': bookings})
+from django.db.models import Count, Avg, F, ExpressionWrapper, fields
+
+@login_required
+@role_required(allowed_roles=['admin'])
+def analytics(request):
+    total_bookings = Booking.objects.count()
+    total_users = User.objects.count()
+    total_drivers = Profile.objects.filter(role='driver').count()
+
+    # Calculate average trip duration
+    average_trip_time = Booking.objects.filter(status='completed').annotate(
+        trip_duration=ExpressionWrapper(
+            F('end_time') - F('start_time'),
+            output_field=fields.DurationField()
+        )
+    ).aggregate(average_duration=Avg('trip_duration'))['average_duration']
+
+    # Driver performance
+    driver_performance = Booking.objects.filter(status='completed').values('driver__username').annotate(
+        trips_completed=Count('id'),
+        average_trip_time=Avg(
+            ExpressionWrapper(
+                F('end_time') - F('start_time'),
+                output_field=fields.DurationField()
+            )
+        )
+    )
+
+    context = {
+        'total_bookings': total_bookings,
+        'total_users': total_users,
+        'total_drivers': total_drivers,
+        'average_trip_time': average_trip_time,
+        'driver_performance': driver_performance,
+    }
+    return render(request, 'accounts/analytics.html', context)

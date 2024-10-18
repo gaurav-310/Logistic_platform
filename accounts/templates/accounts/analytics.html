@@ -1,0 +1,44 @@
+{% extends 'accounts/admin_base.html' %}
+
+{% block title %}Analytics{% endblock %}
+
+{% block content %}
+<h1>Analytics</h1>
+
+<h3>Total Users: {{ total_users }}</h3>
+<h3>Total Drivers: {{ total_drivers }}</h3>
+<h3>Total Bookings: {{ total_bookings }}</h3>
+<h3>Average Trip Duration:
+    {% if average_trip_time %}
+        {{ average_trip_time|floatformat:2 }} hours
+    {% else %}
+        N/A
+    {% endif %}
+</h3>
+
+<h3>Driver Performance</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Driver Name</th>
+            <th>Trips Completed</th>
+            <th>Average Trip Duration (hours)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for performance in driver_performance %}
+        <tr>
+            <td>{{ performance.driver__username }}</td>
+            <td>{{ performance.trips_completed }}</td>
+            <td>
+                {% if performance.average_trip_time %}
+                    {{ performance.average_trip_time.total_seconds|divisibleby:3600|floatformat:2 }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

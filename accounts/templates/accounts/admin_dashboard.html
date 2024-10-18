@@ -1,11 +1,27 @@
-<!-- accounts/templates/accounts/admin_dashboard.html -->
-
 {% extends "base.html" %}
 
+{% block title %}Admin Dashboard - {% block admin_title %}{% endblock %}{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h2>Admin Dashboard</h2>
-    <p>Welcome, {{ user.username }}! This is your dashboard.</p>
-    <!-- Add admin-specific content here -->
-</div>
+    <!-- Admin Main Content -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Optional: Header -->
+                <h2 class="text-center mb-4">Admin Dashboard</h2>
+
+                <!-- Navigation List -->
+                <div class="list-group">
+                    <a href="{% url 'accounts:manage_users' %}" class="list-group-item list-group-item-action">Manage Users</a>
+                    <a href="{% url 'accounts:view_all_bookings' %}" class="list-group-item list-group-item-action">View All Bookings</a>
+                    <a href="{% url 'accounts:analytics' %}" class="list-group-item list-group-item-action">Analytics</a>
+                </div>
+
+                <!-- Back to Dashboard Button -->
+                <div class="text-center mt-4">
+                    <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-primary">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
