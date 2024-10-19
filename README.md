@@ -26,11 +26,9 @@ This scalable logistics platform allows users to book transportation services fo
 
 ### 1. **Clone the Repository**
 
-```bash
-
-  git clone https://github.com/your_username/logistics-platform.git
-
-  cd logistics-platform
+      ```bash
+      git clone https://github.com/your_username/logistics-platform.git
+      cd logistics-platform
 
 ### 2. **Install Dependencies**
 
