@@ -9,16 +9,19 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-import dotenv
-from dotenv import load_dotenv
+
 from django.contrib.messages import constants as messages
 from pathlib import Path
 import os
-import cred
+import dotenv
+from dotenv import load_dotenv
+
 
 load_dotenv()
+GOOGLE_MAPS_API_KEY= os.environ.get("GOOGLE_MAPS_API_KEY")
 
-GOOGLE_MAPS_API_KEY = cred.GOOGLE_MAPS_API_KEY
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,9 +34,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+SECRET_KEY = 'django-insecure-z&o5ln1pbb#+*o!+isypo6d%v@0cnk91r8-#karfi@adc%%wl2'
+DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app']
+
+ALLOWED_HOSTS = []
 
 STATIC_URL = '/static/'
 
@@ -69,6 +74,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.template.context_processors.settings',
+    
     
     
     
@@ -83,6 +90,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',

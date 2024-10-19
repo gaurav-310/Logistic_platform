@@ -58,7 +58,7 @@
 
         <!-- Map and Details Section -->
         <div class="col-md-6 map-section">
-            <div id="map"></div>
+            <div id="map" style="height: 400px; width: 100%;"></div>
             <div id="details">
                 <div class="form-group">
                     <label for="distance-display">Distance:</label>
@@ -75,8 +75,9 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places"></script>
 
+<!-- <p>API Key: {{ GOOGLE_MAPS_API_KEY }}</p>   -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{goo}}&libraries=places"></script>
 <script src="{% static 'js/booking.js' %}"></script>
 
 

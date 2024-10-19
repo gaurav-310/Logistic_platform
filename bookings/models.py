@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+
 class VehicleType(models.Model):
     name = models.CharField(max_length=50)
     base_fare = models.DecimalField(max_digits=6, decimal_places=2)

@@ -7,10 +7,13 @@ from .models import Booking, VehicleType
 from accounts.models import DriverProfile
 import json
 from django.http import JsonResponse
+from django.conf import settings
+
 # Booking detail view
 def booking_detail(request, pk):
     booking = get_object_or_404(Booking, pk=pk)
-    return render(request, 'bookings/booking_detail.html', {'booking': booking})
+    goo = settings.GOOGLE_MAPS_API_KEY
+    return render(request, 'bookings/booking_detail.html', {'booking': booking,'goo':goo})
 
 # Driver dashboard view to see all pending bookings
 @login_required
@@ -20,8 +23,10 @@ def driver_dashboard(request):
 
     context = {
         'pending_bookings': pending_bookings,
+        
     }
-    return render(request, 'accounts/driver_dashboard.html', context)
+    goo = settings.GOOGLE_MAPS_API_KEY
+    return render(request, 'accounts/driver_dashboard.html', context,{'goo':goo})
 
 # Accept booking view
 # bookings/views.py
@@ -91,9 +96,11 @@ def create_booking(request):
             messages.error(request, "Please correct the errors below.")
     else:
         form = BookingForm()
-    
+    # print(settings.GOOGLE_MAPS_API_KEY)
     vehicle_types = VehicleType.objects.all()
-    return render(request, 'bookings/booking_form.html', {'form': form, 'vehicle_types': vehicle_types})
+    goo = settings.GOOGLE_MAPS_API_KEY
+
+    return render(request, 'bookings/booking_form.html', {'form': form, 'vehicle_types': vehicle_types,'goo':goo})
 
 # Confirm booking view
 @login_required
@@ -132,7 +139,9 @@ def confirm_booking(request):
 @login_required
 def user_dashboard(request):
     bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'accounts/user_dashboard.html', {'bookings': bookings})
+    goo = settings.GOOGLE_MAPS_API_KEY
+   
+    return render(request, 'accounts/user_dashboard.html', {'bookings': bookings},{'goo': goo})
 
 # Delete booking view
 @login_required
@@ -169,5 +178,7 @@ def complete_booking(request, booking_id):
         booking.status = 'completed'
         booking.save()
         messages.success(request, 'Booking marked as completed.')
+
+    
 
     return redirect('accounts:driver_dashboard')

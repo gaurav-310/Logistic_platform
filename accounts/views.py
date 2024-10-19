@@ -4,6 +4,7 @@
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
+from django.conf import settings
 from .forms import UserRegistrationForm, DriverProfileForm
 from .models import DriverProfile
 from bookings.models import Booking  # Import Booking model from bookings app
@@ -14,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 from .decorators import role_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-
+from django.conf import settings
 from django.contrib import messages
 from .models import Profile
 
@@ -42,6 +43,7 @@ def register_view(request):
             messages.error(request, "Registration failed. Please correct the errors.")
     else:
         form = UserRegistrationForm()
+    
     return render(request, 'accounts/register.html', {'form': form})
 
 
@@ -81,13 +83,15 @@ def logout_view(request):
 def user_dashboard(request):
     # Fetch all bookings for the logged-in user from the bookings app
     bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'accounts/user_dashboard.html', {'bookings': bookings})
+    goo = settings.GOOGLE_MAPS_API_KEY
+
+    return render(request, 'accounts/user_dashboard.html', {'bookings': bookings,'goo':goo})
 
 
 
 
 @login_required
-@role_required(allowed_roles=['driver'])
+# @role_required(allowed_roles=['driver'])
 def driver_dashboard(request):
     driver_profile, created = DriverProfile.objects.get_or_create(user=request.user)
     
@@ -102,14 +106,19 @@ def driver_dashboard(request):
             driver_profile.save()
             messages.success(request, 'Location updated successfully.')
             return redirect('accounts:driver_dashboard')
-    
+        
+    goo = settings.GOOGLE_MAPS_API_KEY
     context = {
         'driver_profile': driver_profile,
         'current_location': driver_profile.current_location,
         'pending_bookings': pending_bookings,
         'active_bookings': active_bookings,
         'completed_bookings': completed_bookings,
+        'goo':goo,
+        
     }
+    
+
     
     return render(request, 'accounts/driver_dashboard.html', context)
 
@@ -141,11 +150,13 @@ def booking_detail_view(request, booking_id):
     driver_profile = None
     if booking.driver:
         driver_profile = DriverProfile.objects.get(user=booking.driver)
-    
+    goo = settings.GOOGLE_MAPS_API_KEY
     context = {
         'booking': booking,
-        'driver_profile': driver_profile,  # Contains driver's current location
+        'driver_profile': driver_profile,  # Contains driver's current 
+        'goo':goo,
     }
+    
     return render(request, 'accounts/booking_detail.html', context)
 
 @login_required
