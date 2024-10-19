@@ -1,13 +1,13 @@
 # Logistics Platform
 
-This is a scalable logistics platform where users can book transportation services for goods, and drivers can accept or reject bookings. It supports role-based access (admin, user, driver) and integrates Google Maps for location input.
+This scalable logistics platform allows users to book transportation services for goods, and drivers to accept or reject bookings. It features role-based access for admin, user, and driver roles and integrates Google Maps for location input.
 
 ## Features
 
-- Role-based access control: Separate dashboards for Admin, User, and Driver.
-- Google Maps API integration: Autocomplete for location input.
-- Booking Management: Users can create bookings, and drivers can accept or reject them.
-- Admin Control: Admins can manage users and bookings, excluding the ability to deactivate themselves.
+- **Role-based access control**: Separate dashboards for Admin, User, and Driver.
+- **Google Maps API integration**: Autocomplete for location input.
+- **Booking Management**: Users can create bookings, and drivers can accept or reject them.
+- **Admin Control**: Admins can manage users and bookings, excluding the ability to deactivate themselves.
 
 ## Tech Stack
 
@@ -18,76 +18,63 @@ This is a scalable logistics platform where users can book transportation servic
 
 ## Setup Instructions
 
-1. **Clone the Repository**
+### 1. **Clone the Repository**
+	```bash
+	git clone https://github.com/your_username/logistics-platform.git
+	cd logistics-platform
+	```
 
-        ```bash
-         git clone https://github.com/your_username/logistics-platform.git
-         cd logistics-platform
-2. **Install Dependencies**
+### 2. **Install Dependencies**
+	```bash
+	python -m venv venv
+	source venv/bin/activate  # For Linux/MacOS
+	venv\Scripts\activate  # For Windows
+	pip install -r requirements.txt
+	```
 
-   Create a virtual environment and install the dependencies listed in requirements.txt.
+### 3. **Set Up API Keys**
+	Create a `cred.py` file in the root directory to store your API keys:
+	```python
+	# cred.py
+	SECRET_KEY = 'django-insecure-z&o5ln1pbb#+*o!+isypo6d%v@0cnk91r8...'
+	GOOGLE_MAPS_API_KEY = 'AIzaSyCbSg7br_mo3_MCZ...'
+	```
+	Update your Django settings to load these keys:
+	```python
+	# logistics_platform/settings.py
+	from cred import SECRET_KEY, GOOGLE_MAPS_API_KEY
+	```
+	In your HTML templates, add the script to load the Google Maps API:
+	```html
+	<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places"></script>
+	```
 
-          ```bash
-          python -m venv venv
+### 4. **Run Migrations**
+	```bash
+	python manage.py migrate
+	```
 
-3. **Set Up Environment Variables**
+### 5. **Create a Superuser**
+	```bash
+	python manage.py createsuperuser
+	```
+	Follow the prompts to set up your admin account.
 
-   To hide your Google Maps API key, create a `.env` file in the root directory and add the following:
+### 6. **Run the Development Server**
+	```bash
+	python manage.py runserver
+	```
+	You can now access the platform at http://127.0.0.1:8000/.
 
-       ```makefile
-       GOOGLE_MAPS_API_KEY=your_api_key_here
+### 7. **Google Maps API Setup**
+	- Visit the Google Cloud Console.
+	- Create a project and enable the Google Maps JavaScript API.
+	- Generate an API key and add it to your `cred.py` as shown above.
 
-   In your Django settings, add the following:
-   
-You will also need to update your Django settings to load the API key from the .env file. Open logistics_platform/settings.py and add:
-
-          ```python
-           import os
-           from dotenv import load_dotenv
-
-           load_dotenv()  # Load environment variables
-
-           GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
-
-           ```html
-           <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places"></script>
-4. **Run Migrations**
-    Apply database migrations by running:
-
-          ```bash
-   
-          python manage.py migrate
-5. **Create a Superuser**
-
-   Create an admin user with the following command:
-
-          ```bash
-          python manage.py createsuperuser
-Follow the prompts to set up your admin account.
-
-6. **Run the Development Server**
-
-   Start the development server using:
-
-         ```bash
-         python manage.py runserver
-
-You can now access the platform at http://127.0.0.1:8000/.
-
-
-
-7. **Google Maps API Setup**
-
-   - Visit the Google Cloud Console.
-   - Create a project and enable the Google Maps JavaScript API.
-   - Generate an API key and add it to your .env file as shown above.
-
-8. **Deployment**
-
-   To deploy this project, you can use platforms like Heroku, DigitalOcean, or AWS. Make sure to:
-
-   - Set up environment variables on the hosting platform.
-   - Update the `ALLOWED_HOSTS` in `settings.py` with your domain or server IP.
+### 8. **Deployment**
+	To deploy this project, you can use platforms like Heroku, DigitalOcean, or AWS. Make sure to:
+	- Set up environment variables on the hosting platform.
+	- Update the `ALLOWED_HOSTS` in `settings.py` with your domain or server IP.
 
 ## Admin Dashboard Features
 
@@ -112,4 +99,3 @@ Feel free to fork this repository and make pull requests. Contributions are welc
 ## License
 
 This project is licensed under the MIT License.
-
