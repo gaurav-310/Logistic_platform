@@ -26,37 +26,27 @@ This scalable logistics platform allows users to book transportation services fo
 
 ### 1. **Clone the Repository**
 
-      ```bash
-      git clone https://github.com/your_username/logistics-platform.git
-      cd logistics-platform
+         ```bash
+            git clone https://github.com/your_username/logistics-platform.git
+            cd logistics-platform
+     
 
 ### 2. **Install Dependencies**
-
-     ```bash
-
-  python -m venv venv
-
-  source venv/bin/activate  # For Linux/MacOS
-
-  venv\Scripts\activate  # For Windows
-
-  pip install -r requirements.txt
+         ```bash
+           python -m venv venv
+           source venv/bin/activate  # For Linux/MacOS
+           venv\Scripts\activate  # For Windows
+           pip install -r requirements.txt
 
 ### 3. **Set Up API Keys**
 
 Create a `cred.py` file in the root directory to store your API keys:
-
-```python
-
-# cred.py
-
-SECRET_KEY = 'django-insecure-z&o5ln1pbb#+*o!+isypo6d%v@0cnk91r8...'
-
-GOOGLE_MAPS_API_KEY = 'AIzaSyCbSg7br_mo3_MCZ...'
-
-Update your Django settings to load these keys:
-
-```python
+      ```python
+      # cred.py
+      SECRET_KEY = 'django-insecure-z&o5ln1pbb#+*o!+isypo6d%v@0cnk91r8...'
+      GOOGLE_MAPS_API_KEY = 'AIzaSyCbSg7br_mo3_MCZ...'
+      Update your Django settings to load these keys:
+      ```python
 
 # logistics_platform/settings.py
 
