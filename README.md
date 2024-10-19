@@ -20,53 +20,54 @@ This scalable logistics platform allows users to book transportation services fo
 
 ### 1. **Clone the Repository**
 	```bash
-	git clone https://github.com/your_username/logistics-platform.git
-	cd logistics-platform
+	  git clone https://github.com/your_username/logistics-platform.git
+	  cd logistics-platform
 	```
 
 ### 2. **Install Dependencies**
 	```bash
-	python -m venv venv
-	source venv/bin/activate  # For Linux/MacOS
-	venv\Scripts\activate  # For Windows
-	pip install -r requirements.txt
+		python -m venv venv
+		source venv/bin/activate  # For Linux/MacOS
+		venv\Scripts\activate  # For Windows
+		pip install -r requirements.txt
 	```
 
 ### 3. **Set Up API Keys**
 	Create a `cred.py` file in the root directory to store your API keys:
 	```python
-	# cred.py
-	SECRET_KEY = 'django-insecure-z&o5ln1pbb#+*o!+isypo6d%v@0cnk91r8...'
-	GOOGLE_MAPS_API_KEY = 'AIzaSyCbSg7br_mo3_MCZ...'
+		# cred.py
+		SECRET_KEY = 'django-insecure-z&o5ln1pbb#+*o!+isypo6d%v@0cnk91r8...'
+		GOOGLE_MAPS_API_KEY = 'AIzaSyCbSg7br_mo3_MCZ...'
 	```
-	Update your Django settings to load these keys:
+Update your Django settings to load these keys:
 	```python
-	# logistics_platform/settings.py
-	from cred import SECRET_KEY, GOOGLE_MAPS_API_KEY
+		# logistics_platform/settings.py
+		from cred import SECRET_KEY, GOOGLE_MAPS_API_KEY
 	```
 	In your HTML templates, add the script to load the Google Maps API:
 	```html
-	<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places"></script>
 	```
 
 ### 4. **Run Migrations**
 	```bash
-	python manage.py migrate
+		python manage.py migrate
 	```
 
 ### 5. **Create a Superuser**
 	```bash
-	python manage.py createsuperuser
+		python manage.py createsuperuser
 	```
 	Follow the prompts to set up your admin account.
 
 ### 6. **Run the Development Server**
 	```bash
-	python manage.py runserver
+		python manage.py runserver
 	```
-	You can now access the platform at http://127.0.0.1:8000/.
+You can now access the platform at http://127.0.0.1:8000/.
 
 ### 7. **Google Maps API Setup**
+
 	- Visit the Google Cloud Console.
 	- Create a project and enable the Google Maps JavaScript API.
 	- Generate an API key and add it to your `cred.py` as shown above.
