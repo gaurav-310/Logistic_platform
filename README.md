@@ -25,41 +25,35 @@ This scalable logistics platform allows users to book transportation services fo
 ## Setup Instructions
 
 ### 1. **Clone the Repository**
-
-         ```bash
-            git clone https://github.com/your_username/logistics-platform.git
-            cd logistics-platform
-     
+```bash
+git clone https://github.com/your_username/logistics-platform.git
+cd logistics-platform
+```
 
 ### 2. **Install Dependencies**
-         ```bash
-           python -m venv venv
-           source venv/bin/activate  # For Linux/MacOS
-           venv\Scripts\activate  # For Windows
-           pip install -r requirements.txt
-
+```bash
+python -m venv venv
+source venv/bin/activate  # For Linux/MacOS
+venv\Scripts\activate  # For Windows
+pip install -r requirements.txt
+```
 ### 3. **Set Up API Keys**
 
 Create a 'cred.py' file in the root directory to store your API keys:
-       
-      # cred.py
-      SECRET_KEY = 'django-insecure-z&o5ln1pbb#+*o!+isypo6d%v@0cnk91r8...'
-      GOOGLE_MAPS_API_KEY = 'AIzaSyCbSg7br...'
-      Update your Django settings to load these keys:
-      
+```python       
+# cred.py
+SECRET_KEY = 'django-insecure-z&o5ln1pbb#+*o!+isypo6d%v@0cnk91r8...'
+GOOGLE_MAPS_API_KEY = 'AIzaSyCbSg7br...'
+Update your Django settings to load these keys:
+```      
 
 # logistics_platform/settings.py
 
 from cred import SECRET_KEY, GOOGLE_MAPS_API_KEY
-
-```
-
-    In your HTML templates, add the script to load the Google Maps API:
+In your HTML templates, add the script to load the Google Maps API:
 
 ```html
-
 <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places"></script>
-
 ```
 
 ### 4. **Run Migrations**
