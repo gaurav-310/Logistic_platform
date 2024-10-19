@@ -95,9 +95,6 @@ You can now access the platform at http://127.0.0.1:8000/.
 - Create new bookings by entering pickup and drop-off locations.
 - View booking status and driver information.
 
-## Contributing
-
-Feel free to fork this repository and make pull requests. Contributions are welcome!
 
 ## License
 
