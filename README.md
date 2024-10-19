@@ -44,7 +44,7 @@ Create a `cred.py` file in the root directory to store your API keys:
       ```python
       # cred.py
       SECRET_KEY = 'django-insecure-z&o5ln1pbb#+*o!+isypo6d%v@0cnk91r8...'
-      GOOGLE_MAPS_API_KEY = 'AIzaSyCbSg7br_mo3_MCZ...'
+      GOOGLE_MAPS_API_KEY = 'AIzaSyCbSg7br...'
       Update your Django settings to load these keys:
       ```python
 
